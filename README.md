@@ -1,4 +1,4 @@
-Please wait for release for v0.1.0 before you do any of the following
+Please wait for release of v0.1.0 before you do any of the following
 =====================================================================
 JugglingDB Adapter for DynamoDB
 --------------------------------
