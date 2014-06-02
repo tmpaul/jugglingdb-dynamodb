@@ -10,7 +10,9 @@
     "colors" : "latest"
   },
   "devDependencies": {
-	"jugglingdb": ">= 0.1.0"
+	"jugglingdb": ">= 0.1.0",
+  "should": "latest",
+  "mocha": "latest"
   },
   "repository": "",
   "author": {
