@@ -1,7 +1,7 @@
 ##JugglingDB Adapter for DynamoDB
 * Dependencies : `aws-sdk`, `colors`.
-* Installation: The adapter has not been published to the npm registry yet. Once a good set of tests are implemented, it will be published to npm registry. For now git clone the repository to the node_modules directory of your compound app. 
-* `git clone https://github.com/tmpaul/jugglingdb-dynamodb` or download as zip and paste manually.
+* Installation:
+    `npm install jugglingdb-dynamodb`
 * Make sure you have aws-sdk and colors already installed.
 
 ### Using the adapter with DynamoDB Local
