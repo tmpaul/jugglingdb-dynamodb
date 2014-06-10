@@ -62,7 +62,10 @@
 
 ####Model Definition
 ```javascript
-    var User = schemaDynamo.define('User', {
+    var Schema = require('jugglingdb').Schema;
+    var schemaDynamo = new Schema('dynamodb'); // No dynSettings needed.
+
+    var User = schemaDynamo.define('User', {  // No dynSettings passed in define
       id : { type: String, keyType: "hash", uuid: true},
       name: { type: String },
       age: { type: Number},
