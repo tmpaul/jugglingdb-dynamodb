@@ -4,7 +4,7 @@ var User;
 
 describe('dynamodb', function(){
 
-    before(function() {
+    before(function(done) {
       db = getSchema();
       User = db.define('User', {
         id: { type: String, keyType: "hash"},
@@ -12,19 +12,30 @@ describe('dynamodb', function(){
         email: { type: String },
         dob : { type: Date},
         age: {type: Number},
-        tasks: { type: String, properties: { breaker: 2} }
+        tasks: { type: String, properties: { sharding : true, splitter : "10kb"} }
       });
+
+      Book = db.define('Book', {
+        id : { type: String, keyType: "hash"},
+        subject : { type: String, keyType: "range"},
+      });
+
+      setTimeout(function(){
+        done();
+      },1500);
+
     });
 
   beforeEach(function(done) {
     // Table creation is async. Wait 1.5s so that
     // table gets created.
-    setTimeout(function() {
-      done();
-    }, 1500);
+   
+    console.log("------------------------------------------------------");
+    done();
   });
 
   it('should create user without any errors', function (done) {
+    console.log('should create user without any errors');
     var tempUser = new User({
       id : "1",
       name: "John Doe",
@@ -34,7 +45,7 @@ describe('dynamodb', function(){
     });
     User.create(tempUser, function (err, user) {
       should.not.exist(err);
-      user.should.have.property('id'); // Check for UUID generation
+      user.should.have.property('id');
       user.should.have.property('name', 'John Doe');
       user.should.have.property('tasks');
       // Make sure that chunked data is not sent back to
@@ -50,6 +61,7 @@ describe('dynamodb', function(){
     to throw an error here.
    */
   it('should handle undefined and null attributes and return the same from database', function(done){
+    console.log('should handle undefined and null attributes and return the same from database');
      var tempUser = new User({
       id : "2",
       email: null,
@@ -66,6 +78,7 @@ describe('dynamodb', function(){
   });
 
   it('should return error saying hash key cannot be null', function(done){
+    console.log('should return error saying hash key cannot be null');
      var tempUser = new User({
       id: null,
       email: null,
@@ -77,11 +90,32 @@ describe('dynamodb', function(){
       done();
     });
   });
-  /*it('should handle search queries of `all` method', function(done){
-    User.all({ where : { age : { gt: 10} }}, function (err, users) {
-      should.not.exist(err);
-      (users.should.be.instanceof(Array).and.have.lengthOf(1);
-      done();
+
+  it('should create two books for same id but different subjects', function (done) {
+    console.log('should create two books for same id but different subjects');
+    var book1 = new Book({
+      id: "abcd",
+      subject: "Nature"
     });
-  });*/
+
+    var book2 = new Book({
+      id: "abcd",
+      subject: "Fiction"
+    });
+
+    Book.create(book1, function (err, _book1) {
+      should.not.exist(err);
+      should.exist(_book1);
+      _book1.should.have.property('id', 'abcd');
+      _book1.should.have.property('subject', 'Nature');
+
+      Book.create(book2, function (err, _book2) {
+        should.not.exist(err);
+        should.exist(_book2);
+        _book2.should.have.property('id', 'abcd');
+        _book2.should.have.property('subject', 'Fiction');
+        done();
+      });
+    });
+  });
 });
