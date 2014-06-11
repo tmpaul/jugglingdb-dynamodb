@@ -47,7 +47,7 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
     var Schema = require('jugglingdb').Schema;
     var schemaDynamo = new Schema('dynamodb', dynSettings);
 
-    var User = schemaDynamo.define('User',dynSettings, {
+    var User = schemaDynamo.define('User', {
       id : { type: String, keyType: "hash", uuid: true},
       name: { type: String },
       age: { type: Number},
@@ -67,7 +67,7 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
     var Schema = require('jugglingdb').Schema;
     var schemaDynamo = new Schema('dynamodb'); // No dynSettings needed.
 
-    var User = schemaDynamo.define('User', {  // No dynSettings passed in define
+    var User = schemaDynamo.define('User', {
       id : { type: String, keyType: "hash", uuid: true},
       name: { type: String },
       age: { type: Number},
