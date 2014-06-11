@@ -20,10 +20,14 @@ describe('dynamodb', function(){
         subject : { type: String, keyType: "range"},
       });
 
-      setTimeout(function(){
-        done();
-      },1500);
-
+      var modelCount = 0;
+      db.adapter.emitter.on("created", function(){
+        modelCount++;
+        // Tables for both models created in database.
+        if (modelCount === 2) {
+          done();
+        }
+      });
     });
 
   beforeEach(function(done) {
