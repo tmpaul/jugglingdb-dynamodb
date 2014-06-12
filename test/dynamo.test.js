@@ -16,7 +16,8 @@ describe('dynamodb', function(){
       });
 
       Book = db.define('Book', {
-        id : { type: String, keyType: "hash"},
+        id : { type: String, keyType: "pk"},
+        ida : { type: String, keyType: "hash"},
         subject : { type: String, keyType: "range"},
       });
 
@@ -98,25 +99,26 @@ describe('dynamodb', function(){
   it('should create two books for same id but different subjects', function (done) {
     console.log('should create two books for same id but different subjects');
     var book1 = new Book({
-      id: "abcd",
+      ida: "abcd",
       subject: "Nature"
     });
 
     var book2 = new Book({
-      id: "abcd",
+      ida: "abcd",
       subject: "Fiction"
     });
 
     Book.create(book1, function (err, _book1) {
       should.not.exist(err);
       should.exist(_book1);
-      _book1.should.have.property('id', 'abcd');
+      _book1.should.have.property('id', 'abcd--x--Nature');
+      _book1.should.have.property('ida', 'abcd');
       _book1.should.have.property('subject', 'Nature');
 
       Book.create(book2, function (err, _book2) {
         should.not.exist(err);
         should.exist(_book2);
-        _book2.should.have.property('id', 'abcd');
+        _book2.should.have.property('ida', 'abcd');
         _book2.should.have.property('subject', 'Fiction');
         done();
       });
