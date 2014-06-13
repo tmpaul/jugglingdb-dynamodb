@@ -1,8 +1,14 @@
-##JugglingDB Adapter for DynamoDB
+##JugglingDB Adapter for DynamoDB version 0.1.8
+* Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
+with lots of tests.
+* Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
+0.1.5 and below have serious limitations when it comes to real world applications.
+* If you run across any errors while running the adapter, kindly report issues in the github repository.
+* Github repository: <a href = "https://github.com/tmpaul/jugglingdb-dynamodb">jugglingdb-dynamodb</a>
 * Dependencies : `aws-sdk`, `colors`, `async`, `winston`.
 * Installation:
     `npm install jugglingdb-dynamodb`
-* Github repository: <a href = "https://github.com/tmpaul/jugglingdb-dynamodb">jugglingdb-dynamodb</a>
+
 
 ### Using the adapter with DynamoDB Local
 * During the testing/development phase of your application's lifecycle, it is a good idea to use DynamoDB local. DynamoDB local is a java archive file that runs on your machine, and it does a very good job at mocking the original database. Download the file <a href = "http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest">here.</a>
@@ -85,20 +91,28 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
 - DynamoDB stores information in the form of tables. Each table has a collection of items. Think of items as a row in a table. Each
 item in turn is a collection of attributes. Each attribute is stored in the database as a key:value pair.
 
-#####Key Schema
-- DynamoDB primary key is a composite key consiting of a hash key and a range key. For a given item in the table, the key schema can specify
-one hash key or one hash key and a range key.
+####Key Schema
+
+- DynamoDB primary key is a composite key consiting of a hash key and a range key. For a given item in the table, the key schema can specify one hash key or one hash key and a range key.
+
 - To specify a given attribute as hash key, use `keyType: "hash"` along with its definition as shown in the above example.
+
 - DynamoDB expects a hash key for every item that is created. If this value is not available at the time of creation, there is an option to use a UUID generator to generate the hash key. To use this option, specify `uuid: true` in the model definition.
+
 - Similarly, attribute becomes a range key if keyType is set to "range".
 
 
 ###USAGE
 
 #####HASH KEY ONLY
+
 - If a model only has a hash key, any attribute can be specified as the hash key. However, if `uuid` is set to `true`, then the attribute name
 must be `id`. This restriction comes from JugglingDB.
+
+- If you forget to include a hash key for the model, automatically an attribute called `id` is generated with `uuid` set to `true`.
+
 - If no unique ID generation is present, the value of the hash key must be provided at the time of creating an item in the table. In this case, the attribute name can be anything; not just `id`.
+
 ```javascript
     var User = schemaDynamo.define('User', {
     someId : { type: String, keyType: "hash", uuid: true} .... 
@@ -108,8 +122,10 @@ must be `id`. This restriction comes from JugglingDB.
     someId : { type: String, keyType: "hash"}, .....
         // Allowed
 ```
+
 #####HASH & RANGE KEYS
-- If a model has both hash & range keys, a primary key attribute called `id` must be present in the table. The attribute name cannot be anything else other than `id`, or the adapter will throw an error.
+
+- If a model has both hash & range keys, a primary key attribute called `id` must be present in the table. The attribute name cannot be anything else other than `id`, or the adapter will throw an error. Unlike the above given case, `id` attribute does not get created for the object.
 
 - The primary key must be defined as follows:
 ```javascript
@@ -239,6 +255,10 @@ read and write capacity units are set for `User`.
 ```
 
 ####All
+- All method internally uses `query` operation if hash , hash/range keys are provided. Otherwise it will use `scan` operation. Both operations are limited to a result set size of 1 mb by DynamoDB. 
+- To overcome this limitation , the adapter uses an async doWhilst loop to continuously fetch data. Therefore, be careful while using all, especially if you have large datasets.
+- An upcoming version will include an iterator which will allow you to fetch data in batches.
+
 ```javascript
     User.all({
       where : {
@@ -255,13 +275,35 @@ read and write capacity units are set for `User`.
     });
 ```
 
+####UpdateAttributes
+```javascript
+    
+    // Model instance.updateAttributes(...)
+    user.name = "No name";
+    user.updateAttributes(function(err, updatedUser){
+    .....
+    });
+```
+####Save
+- If the object does not exist in the database, invoking save will call `create` method first.
+
+```javascript
+    user.save(function(err, savedUser){
+    .....
+    });
+```
+####Destroy
+```javascript
+    user.destroy(function(err){
+    .....
+    });
+```
 
 ####Upcoming features
 - Support for `limit`, `order` keywords in query filters.
 - Event emitters to notify that table has been created & is active.
 - Support for Sets.
 - Custom logging.
-- Iterator to overcome 1 mb fetch limit for query and scan operator.
 
 ####Bugs, Features, Enhancements etc.
 - The adapter is still in its development stage, and as a result the functionality is still lacking in some areas & few bugs are expected. Please create issues in the github repository to address these. Also please try to include a test case or error log if you are reporting a bug. Good luck!
