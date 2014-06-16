@@ -13,13 +13,17 @@ describe('dynamodb', function(){
         dob : { type: Date},
         age: {type: Number},
         tasks: { type: String, properties: { sharding : true, splitter : "10kb"} }
+      },{
+        table: "user_test"
       });
 
       Book = db.define('Book', {
         id : { type: String, keyType: "pk"},
         ida : { type: String, keyType: "hash"},
         subject : { type: String, keyType: "range"},
-      });
+      }, {
+	table: "book_test"
+	});
 
       var modelCount = 0;
       db.adapter.emitter.on("created", function(){
@@ -32,9 +36,6 @@ describe('dynamodb', function(){
     });
 
   beforeEach(function(done) {
-    // Table creation is async. Wait 1.5s so that
-    // table gets created.
-   
     console.log("------------------------------------------------------");
     done();
   });
