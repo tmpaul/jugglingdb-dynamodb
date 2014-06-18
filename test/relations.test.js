@@ -171,13 +171,13 @@ describe('relations', function() {
             // (new Fear).mind.build().should.be.an.instanceOf(Mind);
             
     
-    db.adapter.emitter.on("created", function () {
-      modelCount++;
-      // Tables for both models created in database.
-      if (modelCount === 4) {
-        done();
-      }
-    });
+        db.adapter.emitter.on("created", function () {
+          modelCount++;
+          // Tables for both models created in database.
+          if (modelCount === 4) {
+            done();
+          }
+        });
             
         });
 
@@ -225,19 +225,19 @@ describe('relations', function() {
             Tag = db.define('Tag', {name: String});
             Article.hasAndBelongsToMany('tags');
             ArticleTag = db.models.ArticleTag;
-    db.adapter.emitter.on("created", function () {
-      modelCount++;
-      // Tables for both models created in database.
-      if (modelCount === 3) {
-        Article.destroyAll(function(){
-            Tag.destroyAll(function(){
-                ArticleTag.destroyAll(function(){
-                    done();
+            db.adapter.emitter.on("created", function () {
+              modelCount++;
+              // Tables for both models created in database.
+              if (modelCount === 3) {
+                Article.destroyAll(function(){
+                    Tag.destroyAll(function(){
+                        ArticleTag.destroyAll(function(){
+                            done();
+                        });
+                    });
                 });
+              }
             });
-        });
-      }
-    });
         });
 
         it('should allow to create instances on scope', function(done) {

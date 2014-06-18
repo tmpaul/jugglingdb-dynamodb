@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.8-3
+##JugglingDB Adapter for DynamoDB version 0.1.8-4
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
@@ -83,7 +83,52 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
     }, {
       table : "User",
       ReadCapacityUnits : 15,
-      WriteCapacityUnits: 20
+      WriteCapacityUnits: 20,
+    });
+```
+
+####Table Creation
+- Table creation is done at the time of model definition. If the table already exists in the database, no action will be taken, otherwise create table command is issued. When a create table command is issued to DynamoDB, the table status will be `CREATING`. The table will be ready for read or writes only when the table status changes to `ACTIVE`. To make sure that tables are ready for your read/write operations, the adapter continuously checks for the table status. This behaviour can be adjusted as follows:
+
+```javascript
+    {
+      table : "User",
+      ReadCapacityUnits : 15,
+      WriteCapacityUnits: 20,
+      tableStatus : { waitTillActive: true, timeInterval : 2000 }
+    });
+```
+- According to the above example, the table status is checked every 2000 ms.
+
+- If tableStatus property is not specified, the adapter automatically checks table status every 1000 ms. To turn this off, specify `waitTillActive` as false.
+
+- Unlike other adapters, dynamodb adapter creates table when schema.define is called. Since the schema.define function does not accept a callback, listen to the `created` event to check for table creation. 
+
+- If checking for table status is enabled, the `created` event is emitted after the table status is `ACTIVE`.
+
+```javascript
+    schemaDynamo.adapter.emitter.on("created", function(err){
+      if (err) {
+        console.log("Error creating tables for model:", User);
+      } else {
+        // Do stuff with user...
+      } 
+    });
+```
+- If there are multiple models in your schema, use the following code instead:
+
+```javascript
+    // Assume there are 4 models. Check test/relations.test.js for an example.
+    var modelCount = 0;
+    schemaDynamo.adapter.emitter.on("created", function(err){
+      if (err) {
+        console.log("Error creating tables for model:", User);
+      } else {
+        modelCount++;
+        if (modelCount == 4) {
+            //.......Do stuff
+        }
+      } 
     });
 ```
 
