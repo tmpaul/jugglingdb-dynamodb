@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.8-4
+##JugglingDB Adapter for DynamoDB version 0.1.9
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
@@ -14,22 +14,11 @@ with lots of tests.
 * During the testing/development phase of your application's lifecycle, it is a good idea to use DynamoDB local. DynamoDB local is a java archive file that runs on your machine, and it does a very good job at mocking the original database. Download the file <a href = "http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest">here.</a>
 * To run DynamoDB Local, use this command from the terminal in the directory where you extracted the tar file: `java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar [options]`
 
-#### Options: 
+##### Options: 
 * -port port_number (8000 by default) 
 * --inMemory (Run in memory).
 
-### Using the adapter with DynamoDB remote
-* Put your AWS access key and secret access key IDs along with the region in `credentials.json` in the root folder of your app. For example, 
-```javascript
-{ 
-  "accessKeyId": "xxxxxxxxxxxxxx", 
-  "secretAccessKey": "xxxxxxxxxxxxxxxxxx", 
-  "region": "us-east-1" 
-}
-```
-If this file is missing, the adapter will try to read host, port , IDs and key from the values you pass in the schema/model file. See below for an example.
-
-### Schema/Model file (DynamoDB Local)
+#### Schema/Model file (DynamoDB Local)
 ```javascript
     var dynSettings = {
       host: "localhost",
@@ -39,7 +28,7 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
     };
 ```
 
-####Options:
+#####Options:
 - host: Address of the dynamodb server. Defaults to "localhost".
 - port: Port number of the dynamodb server. Defaults to "8000".
 - region: DynamoDB server region. Defaults to "ap-southeast-1".
@@ -48,7 +37,7 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
 - maxRetries: Number of connection retries. Defaults to 0.
 - logLevel : Log level. Defaults to "debug".
 
-####Model Definition
+#### Model Definition
 ```javascript
     var Schema = require('jugglingdb').Schema;
     var schemaDynamo = new Schema('dynamodb', dynSettings);
@@ -64,14 +53,29 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
       table : "User"
     });
 ```
-
-### Schema/Model file (DynamoDB Remote)
-- Settings are loaded by adapter from `credentials.json`.
-
-####Model Definition
+### Using the adapter with DynamoDB remote
+* Put your AWS access key and secret access key IDs along with the region in `credentials.json` in the root folder of your app. For example, 
 ```javascript
+{ 
+  "accessKeyId": "xxxxxxxxxxxxxx", 
+  "secretAccessKey": "xxxxxxxxxxxxxxxxxx", 
+  "region": "us-east-1" 
+}
+```
+If this file is missing, the adapter will try to read host, port , IDs and key from the values you pass in the schema/model file. See below for an example.
+
+#### Schema/Model file (DynamoDB Remote)
+- The adpater first looks for environment variables `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`. If these values are found, extra settings like region, maxRetries are loaded from `dynSettings`. Example:
+```javascript
+    var dynSettings = { region: "us-east-1", logLevel: "info" }
+```
+- If environement variables cannot be located, settings are loaded by adapter from `credentials.json`. Any extra settings like log level can still be passed with `dynSettings`.
+
+#### Model Definition
+```javascript
+    var dynSettings = { logLevel : 'info' }
     var Schema = require('jugglingdb').Schema;
-    var schemaDynamo = new Schema('dynamodb'); // No dynSettings needed.
+    var schemaDynamo = new Schema('dynamodb', dynSettings);
 
     var User = schemaDynamo.define('User', {
       id : { type: String, keyType: "hash", uuid: true},
@@ -102,20 +106,27 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
 
 - If tableStatus property is not specified, the adapter automatically checks table status every 1000 ms. To turn this off, specify `waitTillActive` as false.
 
-- Unlike other adapters, dynamodb adapter creates table when schema.define is called. Since the schema.define function does not accept a callback, listen to the `created` event to check for table creation. 
+#### Created Event
+- Unlike other adapters, dynamodb adapter creates table when schema.define is called. Since the schema.define function does not accept a callback, listen to the `created` event to check for table creation. The adapter also fires off a secondary `created-modelName` event right after `created`. `modelname` is the model's name in LOWERCASE. The secondary event can be used to resolve ambiguities as to which model was created.
 
-- If checking for table status is enabled, the `created` event is emitted after the table status is `ACTIVE`.
+- Additionally, if checking for table status is enabled, the `created` event is emitted after the table status is `ACTIVE`.
 
+##### One model defined in a file
 ```javascript
-    schemaDynamo.adapter.emitter.on("created", function(err){
-      if (err) {
-        console.log("Error creating tables for model:", User);
-      } else {
-        // Do stuff with user...
-      } 
+    schemaDynamo.adapter.emitter.on("created", function(){
+        // Do stuff with user... 
     });
 ```
-- If there are multiple models in your schema, use the following code instead:
+##### Multiple model definitions at different places/functions in a file
+- If you have multiple model definitions at different places or even different functions in the same file, consider listening to the `created-modelName` event. Example:
+
+```javascript
+    schemaDynamo.adapter.emitter.on("created-user", function(){
+        // Do stuff with user...
+    });
+```
+##### Multiple model definitions at same place/function in a file
+- If there are multiple models in your schema defined together in the same function or the same place, use the following code instead:
 
 ```javascript
     // Assume there are 4 models. Check test/relations.test.js for an example.
@@ -343,12 +354,14 @@ read and write capacity units are set for `User`.
     .....
     });
 ```
+### Running Tests
+- It is strongly recommended to run tests using DynamoDB local. Run tests by issuing `npm test` command.
+- `mocha` and `should` are required for the tests to run.
 
 ####Upcoming features
 - Support for `limit`, `order` keywords in query filters.
 - Event emitters to notify that table has been created & is active.
-- Support for Sets.
-- Custom logging.
+
 
 ####Bugs, Features, Enhancements etc.
 - The adapter is still in its development stage, and as a result the functionality is still lacking in some areas & few bugs are expected. Please create issues in the github repository to address these. Also please try to include a test case or error log if you are reporting a bug. Good luck!

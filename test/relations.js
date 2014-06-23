@@ -16,7 +16,13 @@ describe('relations', function() {
       modelCount++;
       // Tables for both models created in database.
       if (modelCount === 4) {
-        done();
+        Book.destroyAll(function(){
+          Chapter.destroyAll(function(){
+            Author.destroyAll(function(){
+              Reader.destroyAll(done);
+            });
+          });
+        });
       }
     });
 
@@ -175,7 +181,13 @@ describe('relations', function() {
           modelCount++;
           // Tables for both models created in database.
           if (modelCount === 4) {
-            done();
+            List.destroyAll(function(){
+              Item.destroyAll(function(){
+                Fear.destroyAll(function(){
+                  Mind.destroyAll(done);
+                });
+              });
+            });
           }
         });
             

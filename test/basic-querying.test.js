@@ -14,9 +14,9 @@ describe('basic-querying', function() {
             order: {type: Number, index: true, sort: true, limit: 100}
         });
 
-       	db.adapter.emitter.on("created", function(){
-          done();
-      });
+        db.adapter.emitter.on("created-user", function(){
+          User.destroyAll(done);
+        });
 
     });
 
@@ -44,7 +44,7 @@ describe('basic-querying', function() {
                     should.not.exist(err);
                     u.should.be.an.instanceOf(User);
 					u.destroy(function(err) {
-						 done();
+            done();
 					});
                    
                 });

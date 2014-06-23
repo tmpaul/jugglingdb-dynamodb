@@ -1,6 +1,6 @@
 var should = require('./init.js');
 
-var User;
+var db, User;
 
 describe('dynamodb', function(){
 
@@ -13,8 +13,6 @@ describe('dynamodb', function(){
         dob : { type: Date},
         age: {type: Number},
         tasks: { type: String, properties: { sharding : true, splitter : "10kb"} }
-      },{
-        table: "user_test"
       });
 
       Book = db.define('Book', {
@@ -22,26 +20,23 @@ describe('dynamodb', function(){
         ida : { type: String, keyType: "hash"},
         subject : { type: String, keyType: "range"},
       }, {
-	table: "book_test"
-	});
+	       table: "book_test"
+    	});
 
       var modelCount = 0;
       db.adapter.emitter.on("created", function(){
         modelCount++;
         // Tables for both models created in database.
         if (modelCount === 2) {
-          done();
+          Book.destroyAll(function(){
+            User.destroyAll(done);
+          });
         }
       });
     });
 
-  beforeEach(function(done) {
-    console.log("------------------------------------------------------");
-    done();
-  });
 
   it('should create user without any errors', function (done) {
-    console.log('should create user without any errors');
     var tempUser = new User({
       id : "1",
       name: "John Doe",
@@ -67,7 +62,6 @@ describe('dynamodb', function(){
     to throw an error here.
    */
   it('should handle undefined and null attributes and return the same from database', function(done){
-    console.log('should handle undefined and null attributes and return the same from database');
      var tempUser = new User({
       id : "2",
       email: null,
@@ -84,7 +78,6 @@ describe('dynamodb', function(){
   });
 
   it('should return error saying hash key cannot be null', function(done){
-    console.log('should return error saying hash key cannot be null');
      var tempUser = new User({
       id: null,
       email: null,
@@ -98,7 +91,6 @@ describe('dynamodb', function(){
   });
 
   it('should create two books for same id but different subjects', function (done) {
-    console.log('should create two books for same id but different subjects');
     var book1 = new Book({
       ida: "abcd",
       subject: "Nature"
