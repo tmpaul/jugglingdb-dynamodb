@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.9-1
+##JugglingDB Adapter for DynamoDB version 0.1.9-2
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
@@ -104,7 +104,7 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
 ```
 - According to the above example, the table status is checked every 2000 ms.
 
-- If tableStatus property is not specified, the adapter automatically checks table status every 1000 ms. To turn this off, specify `waitTillActive` as false.
+- If tableStatus property is not specified, the adapter automatically checks table status every 5000 ms. To turn this off, specify `waitTillActive` as false.
 
 #### Created Event
 - Unlike other adapters, dynamodb adapter creates table when schema.define is called. Since the schema.define function does not accept a callback, listen to the `created` event to check for table creation. The adapter also fires off a secondary `created-modelName` event right after `created` where `modelname` is the model's name in LOWERCASE. The secondary event can be used to resolve ambiguities as to which model was created.
