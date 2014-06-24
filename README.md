@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.9-2
+##JugglingDB Adapter for DynamoDB version 0.1.9-3
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
@@ -353,10 +353,10 @@ read and write capacity units are set for `User`.
 ### Running Tests
 - It is strongly recommended to run tests using DynamoDB local. Run tests by issuing `npm test` command.
 - `mocha` and `should` are required for the tests to run.
+- Default test `logLevel` is `debug`. You can suppress output of the test by changing the logLevel in `test/init.js` to `error`.
 
 ####Upcoming features
-- Support for `limit`, `order` keywords in query filters.
-- Event emitters to notify that table has been created & is active.
+- Support for String, Binary and Number sets.
 
 
 ####Bugs, Features, Enhancements etc.

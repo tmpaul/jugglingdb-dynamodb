@@ -66,12 +66,73 @@ describe('basic-querying', function() {
             });
         });
         
+        it('should query limited collection', function(done) {
+            User.all({limit: 3}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.should.have.lengthOf(3);
+                done();
+            });
+        });
         
+        it('should query offset collection with limit', function(done) {
+            User.all({skip: 1, limit: 4}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.should.have.lengthOf(4);
+                done();
+            });
+        });
+
         it('should query filtered collection', function(done) {
             User.all({where: {role: 'lead'}}, function(err, users) {
                 should.exists(users);
                 should.not.exists(err);
                 users.should.have.lengthOf(2);
+                done();
+            });
+        });
+
+        it('should query collection sorted by numeric field', function(done) {
+            User.all({order: 'order'}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.forEach(function(u, i) {
+                    u.order.should.eql(i + 1);
+                });
+                done();
+            });
+        });
+
+        it('should query collection desc sorted by numeric field', function(done) {
+            User.all({order: 'order DESC'}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.forEach(function(u, i) {
+                    u.order.should.eql(users.length - i);
+                });
+                done();
+            });
+        });
+
+        it('should query collection sorted by string field', function(done) {
+            User.all({order: 'name'}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.shift().name.should.equal('George Harrison');
+                users.shift().name.should.equal('John Lennon');
+                users.pop().name.should.equal('Stuart Sutcliffe');
+                done();
+            });
+        });
+
+        it('should query collection desc sorted by string field', function(done) {
+            User.all({order: 'name DESC'}, function(err, users) {
+                should.exists(users);
+                should.not.exists(err);
+                users.pop().name.should.equal('George Harrison');
+                users.pop().name.should.equal('John Lennon');
+                users.shift().name.should.equal('Stuart Sutcliffe');
                 done();
             });
         });
