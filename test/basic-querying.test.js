@@ -11,7 +11,8 @@ describe('basic-querying', function() {
             name: {type: String, sort: true, limit: 100},
             email: {type: String, index: true, limit: 100},
             role: {type: String, index: true, limit: 100},
-            order: {type: Number, index: true, sort: true, limit: 100}
+            order: {type: Number, index: true, sort: true, limit: 100},
+            tasks: { type: String, sharding : true, splitter : "10kb" }
         });
 
         db.adapter.emitter.on("created-user", function(){
@@ -164,12 +165,14 @@ function seed(done) {
             name: 'John Lennon',
             mail: 'john@b3atl3s.co.uk',
             role: 'lead',
-            order: 2
+            order: 2,
+            tasks: 'Sing me a song'
         }, {
             name: 'Paul McCartney',
             mail: 'paul@b3atl3s.co.uk',
             role: 'lead',
-            order: 1
+            order: 1,
+            tasks: 'Play me a tune'
         },
         {name: 'George Harrison', order: 5},
         {name: 'Ringo Starr', order: 6},

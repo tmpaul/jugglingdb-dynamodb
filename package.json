@@ -1,10 +1,11 @@
 {
   "name": "jugglingdb-dynamodb",
   "description": "DynamoDB adapter for JugglingDB ORM",
-  "version": "0.1.9-3",
+  "version": "0.1.9-4",
   "main": "index.js",
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000"
   },
   "dependencies": {
     "aws-sdk": "latest",

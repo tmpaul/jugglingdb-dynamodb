@@ -75,25 +75,6 @@ describe('relations', function() {
             });
         });
 
-        it.skip('should fetch all scoped instances', function(done) {
-            Book.create(function(err, book) {
-                book.chapters.create({name: 'a'}, function() {
-                    book.chapters.create({name: 'z'}, function() {
-                        book.chapters.create({name: 'c'}, function() {
-                            fetch(book);
-                        });
-                    });
-                });
-            });
-            function fetch(book) {
-                book.chapters(function(err, ch) {
-                    should.not.exist(err);
-                    should.exist(ch);
-                    ch.should.have.lengthOf(3);
-                });
-            }
-        });
-
         it('should find scoped record', function(done) {
             var id;
             Book.create(function(err, book) {

@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.9-3
+##JugglingDB Adapter for DynamoDB version 0.1.9-4
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
@@ -137,6 +137,11 @@ If this file is missing, the adapter will try to read host, port , IDs and key f
             //.......Do stuff
         }
     });
+```
+- <strong>Important Note</strong>
+
+``` javascript
+    During model definition, all errors are thrown because `schema.define` does not accept a callback. 
 ```
 
 ###Explanation
@@ -356,7 +361,7 @@ read and write capacity units are set for `User`.
 - Default test `logLevel` is `debug`. You can suppress output of the test by changing the logLevel in `test/init.js` to `error`.
 
 ####Upcoming features
-- Support for String, Binary and Number sets.
+- Support for String, Number sets.
 
 
 ####Bugs, Features, Enhancements etc.
