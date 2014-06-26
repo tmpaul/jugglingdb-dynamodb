@@ -25,7 +25,7 @@ describe('basic-querying', function() {
     describe('find', function() {
 
         before(function(done) {
-		done();
+            done();
         });
 
         it('should query by id: not found', function(done) {
@@ -45,7 +45,7 @@ describe('basic-querying', function() {
                     should.not.exist(err);
                     u.should.be.an.instanceOf(User);
 					u.destroy(function(err) {
-            done();
+                        done();
 					});
                    
                 });
@@ -140,6 +140,28 @@ describe('basic-querying', function() {
 
     });
 
+    describe('count', function() {
+
+        before(seed);
+
+        it('should query total count', function(done) {
+            User.count(function(err, n) {
+                should.not.exist(err);
+                should.exist(n);
+                n.should.equal(6);
+                done();
+            });
+        });
+
+        it('should query filtered count', function(done) {
+            User.count({role: 'lead'}, function(err, n) {
+                should.not.exist(err);
+                should.exist(n);
+                n.should.equal(2);
+                done();
+            });
+        });
+    });
 
     describe('findOne', function() {
 
@@ -157,6 +179,35 @@ describe('basic-querying', function() {
 
     });
 });
+
+
+
+    describe('exists', function() {
+
+        before(seed);
+
+        it('should check whether record exist', function(done) {
+            User.findOne(function(e, u) {
+                User.exists(u.id, function(err, exists) {
+                    should.not.exist(err);
+                    should.exist(exists);
+                    exists.should.be.ok;
+                    done();
+                });
+            });
+        });
+
+        it('should check whether record not exist', function(done) {
+            User.destroyAll(function() {
+                User.exists("asdasd", function(err, exists) {
+                    should.not.exist(err);
+                    exists.should.not.be.ok;
+                    done();
+                });
+            });
+        });
+
+    });
 
 function seed(done) {
     var count = 0;
@@ -180,9 +231,11 @@ function seed(done) {
         {name: 'Stuart Sutcliffe', order: 3}
     ];
     
+    User.destroyAll(function() {
         beatles.forEach(function(beatle) {
             User.create(beatle, ok);
         });
+    });
   
 
     function ok() {
