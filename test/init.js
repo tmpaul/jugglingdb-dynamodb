@@ -6,7 +6,7 @@ global.getSchema = function() {
     var db = new Schema(require('../'), {
         host: 'localhost',
         port: '8000',
-        logLevel: 'error'
+        logLevel: 'info'
     });
     db.log = function (a) { console.log(a); };
 
