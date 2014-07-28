@@ -1,4 +1,4 @@
-##JugglingDB Adapter for DynamoDB version 0.1.9-5
+##JugglingDB Adapter for DynamoDB version 0.1.9-6
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
 * Always use the latest version of this adapter, preferably >= 0.1.5. The latest version has more features and lots of bug fixes. Versions
