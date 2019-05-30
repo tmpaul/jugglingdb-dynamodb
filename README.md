@@ -1,3 +1,5 @@
+# Status: Abandoned.
+
 ##JugglingDB Adapter for DynamoDB version 0.1.9-6
 * Adapter is still in development stage. The stable release will be 0.2.0 and will offer rich functionalities along
 with lots of tests.
